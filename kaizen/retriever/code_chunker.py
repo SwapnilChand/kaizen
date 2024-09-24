@@ -1,3 +1,6 @@
+"""
+This module is designed to parse source code and extract various elements such as imports, globalvariables, functions, classes, and more. It utilizes the Tree-sitter library for parsing, which allows forefficient and incremental parsing of code.
+"""
 from typing import Dict, Any
 from kaizen.retriever.tree_sitter_utils import parse_code, ParserFactory
 import os
@@ -6,6 +9,16 @@ ParsedBody = Dict[str, Dict[str, Any]]
 
 
 def chunk_code(code: str, language: str) -> ParsedBody:
+    """
+    This function takes a string of code and its language as input and returns a structured dictionary containing various code elements.
+
+    Args:
+        code (str): a string of code
+        language (str): language of above code
+
+    Returns:
+        ParsedBody: A type alias of type Dict for the structure that will hold the parsed code elements. This dictionary will store all extracted elements categorized accordingly.
+    """
     parser = ParserFactory.get_parser(language)
     tree = parser.parse(code.encode("utf8"))
     code_bytes = code.encode("utf8")
@@ -23,6 +36,12 @@ def chunk_code(code: str, language: str) -> ParsedBody:
     }
 
     def process_node(node):
+        """
+        Recursively processes each node in the syntax tree. It checks if the node is a valid code element and adds it to the appropriate dictionary in body.
+
+        Args:
+            node (_type_): _description_
+        """
         result = parse_code(node, code_bytes)
         if result:
             start_line = result.get("start_line", 0)
@@ -108,7 +127,7 @@ def chunk_code(code: str, language: str) -> ParsedBody:
 
     process_node(tree.root_node)
 
-    # Collect remaining code as other_blocks
+    # Collect remaining unprocessed code blocks as other_blocks
     collected_ranges = []
     for section in body.values():
         if isinstance(section, dict):
@@ -135,10 +154,14 @@ def chunk_code(code: str, language: str) -> ParsedBody:
 
 
 def is_react_hook(name: str) -> bool:
+    """Checks if a function name indicates a React hook (i.e. useState, useEffect, etc.)
+    """
     return name.startswith("use") and len(name) > 3 and name[3].isupper()
 
 
 def is_react_component(code: str) -> bool:
+    """Determines if a piece of code represents a React component based on certain keywords.
+    """
     return (
         "React" in code
         or "jsx" in code.lower()
@@ -150,6 +173,7 @@ def is_react_component(code: str) -> bool:
 
 
 def clean_filename(filepath):
+    # This method cleans up file paths by removing unnecessary components.
     # Split the path into components
     path_components = filepath.split(os.sep)
 

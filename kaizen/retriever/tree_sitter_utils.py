@@ -100,8 +100,25 @@ def traverse_tree(node, code_bytes: bytes) -> Dict[str, Any]:
     else:
         return None
 
-
 def parse_code(node: Any, code_bytes: bytes) -> Dict[str, Any]:
+    """
+    Parses a given code node and extracts relevant information.
+
+    Parameters:
+    node (Any): The code node to be parsed. This is assumed to be an instance of a tree-sitter node.
+    code_bytes (bytes): The original code as bytes. This is used to extract the actual code snippet.
+
+    Returns:
+    Dict[str, Any]: A dictionary containing the extracted information. The dictionary will have the following keys:
+        - 'type': The type of the code element (e.g., function, class, component, impl).
+        - 'name': The name of the code element.
+        - 'code': The actual code snippet.
+        - 'start_line': The starting line number of the code element in the original code.
+        - 'end_line': The ending line number of the code element in the original code.
+
+    Raises:
+    Exception: If an error occurs during parsing, it will be raised with an appropriate error message.
+    """
     try:
         return traverse_tree(node, code_bytes)
     except Exception as e:

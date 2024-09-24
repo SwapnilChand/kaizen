@@ -1,6 +1,5 @@
 from typing import Dict, Any
 
-
 class AbstractionFeedback:
     def __init__(self):
         self.feedback_store: Dict[str, Dict[str, Any]] = {}
