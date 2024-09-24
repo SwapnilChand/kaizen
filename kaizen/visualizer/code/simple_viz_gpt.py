@@ -89,6 +89,5 @@ def visualize_static(code_path, all_files_directory=None):
     plt.savefig('code_structure_visualization.png', format='png')
     plt.show()
 
-# Example usage:
 # Visualize the file "example.py" within the directory "sample_codebase"
-visualize_static('C:\\Users\\swapn\\Desktop\\Desktop\\WEALTH\\Code\\Job\\cloudcode\\kaizen\\kaizen\\visualizer\\sample\\shapes.py')
+visualize_static('C:\\Users\\swapn\\Desktop\\Desktop\\WEALTH\\Code\\Job\\cloudcode\\kaizen\\kaizen\\visualizer\\sample\\sample.rs')

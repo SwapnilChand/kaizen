@@ -2,6 +2,7 @@ import tree_sitter_python
 import tree_sitter_javascript
 import tree_sitter_typescript
 import tree_sitter_rust
+import tree_sitter_java
 from tree_sitter import Language, Parser
 from typing import Dict, Any
 import logging
@@ -17,6 +18,7 @@ JS_LANGUAGE = Language(tree_sitter_javascript.language())
 TS_LANGUAGE = Language(tree_sitter_typescript.language_typescript())
 TSX_LANGUAGE = Language(tree_sitter_typescript.language_tsx())
 RUST_LANGUAGE = Language(tree_sitter_rust.language())
+JAVA_LANGUAGE = Language(tree_sitter_java.language())
 
 
 class LanguageLoader:
@@ -27,7 +29,9 @@ class LanguageLoader:
             "python": PY_LANGUAGE,
             "javascript": JS_LANGUAGE,
             "typescript": TS_LANGUAGE,
+            "typescript": TSX_LANGUAGE,
             "rust": RUST_LANGUAGE,
+            "java": JAVA_LANGUAGE,  
         }
         lang = language.replace("tree-sitter-", "")
         if lang not in language_map:

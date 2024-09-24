@@ -1,0 +1,18 @@
+```plantuml
+@startuml
+class A {
+    +method_a()
+}
+
+class B {
+    +method_b(a : A)
+}
+
+class C {
+    +method_c(b : B)
+}
+
+A --|> B
+B --|> C
+@enduml
+```

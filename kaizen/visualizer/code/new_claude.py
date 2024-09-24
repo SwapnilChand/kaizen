@@ -3,8 +3,8 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 from kaizen.retriever.code_chunker import chunk_code
-from kaizen.retriever.tree_sitter_utils import ParserFactory
 from typing import Dict, Any, Union, List
+
 def build_code_graph(parsed_body: Dict[str, Any]) -> nx.Graph:
     G = nx.Graph()
     
@@ -26,10 +26,11 @@ def build_code_graph(parsed_body: Dict[str, Any]) -> nx.Graph:
                         G.add_edge(node, other_node)
 
     return G
+
 def visualize_code_graph(G: nx.Graph, output_file: str = 'code_graph.png', highlighted_file: str = None):
-    plt.figure(figsize=(10, 8))
-    pos = nx.planar_layout(G)  # Reduced k value for closer nodes
-    # k = 0.5 , iterations=50) for spring layout 
+    plt.figure(figsize=(12, 10))  # Increased figure size
+    pos = nx.spring_layout(G, k=0.5)  # Use spring layout with adjusted spacing
+
     node_colors = {
         'imports': '#AED6F1',
         'global_variables': '#A2D9CE',
@@ -38,55 +39,74 @@ def visualize_code_graph(G: nx.Graph, output_file: str = 'code_graph.png', highl
         'classes': '#D7BDE2',
         'components': '#F5B7B1',
         'hooks': '#FADBD8',
-        'type_definitions': '#D5DBDB'
+        'type_definitions': '#D5DBDB',
+        'methods': '#F5B7B1'  # Added color for methods
     }
 
-    # Draw edges
-    nx.draw_networkx_edges(G, pos, alpha=0.3, edge_color='gray', arrows=True, arrowsize=10)
+    # Draw edges with arrows
+    nx.draw_networkx_edges(G, pos, alpha=0.3, edge_color='gray', arrows=True)
 
-    # Draw nodes
+    # Draw nodes with colors based on their type
     for node_type, color in node_colors.items():
         node_list = [node for node, data in G.nodes(data=True) if data['type'] == node_type]
         nx.draw_networkx_nodes(G, pos, nodelist=node_list, node_color=color, node_size=2000, alpha=0.8)
 
-    # Highlight nodes from the selected file
+    # Highlight nodes from the selected file (if applicable)
     if highlighted_file:
         highlighted_nodes = [node for node, data in G.nodes(data=True) 
                              if highlighted_file in data['details'].get('file', '')]
-        nx.draw_networkx_nodes(G, pos, nodelist=highlighted_nodes, node_color='orange', 
-                               node_size=2200, alpha=0.9, edgecolors='darkorange')
+        nx.draw_networkx_nodes(G, pos, nodelist=highlighted_nodes,
+                               node_color='orange', 
+                               node_size=2200, alpha=0.9,
+                               edgecolors='darkorange')
 
     # Draw labels below the nodes
     label_pos = {k: (v[0], v[1]-0.1) for k, v in pos.items()}  # Adjust label position
-    nx.draw_networkx_labels(G, label_pos, font_size=8, font_weight='bold')
-
-    # Add legend
-    legend_elements = [plt.Line2D([0], [0], marker='o', color='w', label=node_type.replace('_', ' ').title(),
-                                  markerfacecolor=color, markersize=10) 
-                       for node_type, color in node_colors.items()]
-    plt.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05),
-               ncol=4, fontsize=8)
+    nx.draw_networkx_labels(G, label_pos, font_size=8)
 
     # Add title in a box
     title = f"Code Structure: {os.path.abspath(highlighted_file)}" if highlighted_file else "Code Structure Visualization"
-    plt.title(title, fontsize=12, fontweight='bold', bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
+    plt.title(title,
+              fontsize=12,
+              fontweight='bold',
+              bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
 
-    # Add class-method relationships
-    for node, data in G.nodes(data=True):
-        if data['type'] == 'classes':
-            methods = [m for m, d in G.nodes(data=True) if d['type'] in ['functions', 'methods'] and node in d['details'].get('code', '')]
-            for method in methods:
-                plt.annotate("", xy=pos[method], xytext=pos[node],
-                             arrowprops=dict(arrowstyle="->", color="red", lw=1, alpha=0.5))
+    # Add a box around the graph
+    ax = plt.gca()
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+    
+    # Create a rectangle patch around the graph
+    box = plt.Rectangle((xlim[0] - 0.1 * (xlim[1] - xlim[0]), ylim[0] - 0.1 * (ylim[1] - ylim[0])),
+                        xlim[1] - xlim[0] + 0.2 * (xlim[1] - xlim[0]),
+                        ylim[1] - ylim[0] + 0.2 * (ylim[1] - ylim[0]),
+                        fill=False,
+                        edgecolor='black',
+                        linewidth=2)
+    
+    ax.add_patch(box)
 
-    plt.axis('off')
-    plt.tight_layout()
-    plt.savefig(output_file, format='png', dpi=300, bbox_inches='tight')
+    # Draw legend for color palette
+    legend_elements = [plt.Line2D([0], [0], marker='o', color='w', label=node_type.replace('_', ' ').title(),
+                                  markerfacecolor=color, markersize=10) 
+                       for node_type, color in node_colors.items()]
+    
+    plt.legend(handles=legend_elements,
+               loc='upper center',
+               bbox_to_anchor=(0.5, -0.05),
+               ncol=len(node_colors),
+               fontsize=8)
+
+    plt.axis('off')  # Turn off axis
+    plt.tight_layout(pad=2)  # Adjust layout to prevent clipping of labels
+    plt.savefig(output_file, format='png', dpi=300)
     plt.close()
+
 def process_file(file_path: str, language: str) -> Dict[str, Any]:
     with open(file_path, 'r', encoding='utf-8') as file:
         code = file.read()
     parsed_body = chunk_code(code, language)
+    
     # Add file information to each element
     for key, elements in parsed_body.items():
         if isinstance(elements, dict):
@@ -101,7 +121,9 @@ def process_file(file_path: str, language: str) -> Dict[str, Any]:
                     element['file'] = file_path
                 else:
                     elements[i] = {'code': element, 'file': file_path}
+    
     return parsed_body
+
 def visualize_code(input_path: Union[str, List[str]], language: str, output_file: str = 'code_graph.png'):
     if isinstance(input_path, str):
         if os.path.isfile(input_path):
@@ -134,7 +156,7 @@ def visualize_code(input_path: Union[str, List[str]], language: str, output_file
             elif isinstance(combined_parsed_body[key], list) and isinstance(value, list):
                 combined_parsed_body[key].extend(value)
             else:
-                # If types don't match, convert to list and extend
+                # If types don't match convert to list and extend
                 if not isinstance(combined_parsed_body[key], list):
                     combined_parsed_body[key] = [combined_parsed_body[key]]
                 if not isinstance(value, list):
@@ -142,17 +164,29 @@ def visualize_code(input_path: Union[str, List[str]], language: str, output_file
                 combined_parsed_body[key].extend(value)
 
     graph = build_code_graph(combined_parsed_body)
-    visualize_code_graph(graph, output_file, highlighted_file)
+    visualize_code_graph(graph,
+                          output_file=output_file,
+                          highlighted_file=highlighted_file)
+    
     print(f"Code visualization saved to {output_file}")
+
 if __name__ == "__main__":
-
+    
     parser = argparse.ArgumentParser(description='Visualize code structure')
-    parser.add_argument('input_path', type=str, help='Path to the code file or directory')
-    parser.add_argument('language', type=str, choices=['python', 'javascript', 'typescript', 'rust'], 
+    
+    parser.add_argument('input_path', type=str,
+                        help='Path to the code file or directory')
+    
+    parser.add_argument('language', type=str,
+                        choices=['python', 'javascript', 'typescript', 'rust'],
                         help='Programming language of the code file(s)')
-    parser.add_argument('--output', type=str, default='code_graph.png', 
+    
+    parser.add_argument('--output', type=str,
+                        default='code_graph.png',
                         help='Output file name (default: code_graph.png)')
-
+    
     args = parser.parse_args()
-
-    visualize_code(args.input_path, args.language, args.output)
+    
+    visualize_code(args.input_path,
+                   args.language,
+                   args.output)
