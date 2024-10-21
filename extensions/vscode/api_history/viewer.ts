@@ -1,3 +1,5 @@
+// Use this code to decode msgpack to json stringify
+
 import * as fs from 'fs';
 import * as msgpack from 'msgpack-lite';
 

@@ -1,9 +1,6 @@
 import * as vscode from 'vscode';
 import { ApiRequestView } from './apiRequestView';
 import { HttpClient } from '../utils/httpClient';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as msgpack from 'msgpack-lite'; 
 
 interface Collection {
     name: string;
@@ -32,15 +29,33 @@ export class ApiRequestProvider {
         this.handleApiRequest = this.handleApiRequest.bind(this);
         this.loadCollections();
         this.loadEnvironment();
-        this.loadApiHistory(); // Load existing API history
+        this.loadApiHistory(); 
     }
 
-    public openApiRequestView() {
+    public openApiRequestView(endpoint?: ApiRequest) {
         if (!this.view) {
             this.view = new ApiRequestView(this.context, this.handleApiRequest);
         }
+        
+        // Show the view
         this.view.show();
+
+        // If an endpoint is provided, populate its details
+        if (endpoint) {
+            this.populateFields(endpoint);
+        }
+
         this.updateCollectionsView();
+    }
+
+    private populateFields(endpoint: ApiRequest) {
+        // Assuming you have methods in your ApiRequestView to set these values
+        if (this.view) {
+            this.view.setMethod(endpoint.method); // Method setter in ApiRequestView
+            this.view.setUrl(endpoint.url);       // URL setter in ApiRequestView
+            this.view.setHeaders(endpoint.headers); // Headers setter in ApiRequestView
+            this.view.setBody(endpoint.body);     // Body setter in ApiRequestView
+        }
     }
 
     private async handleApiRequest(
@@ -92,7 +107,7 @@ export class ApiRequestProvider {
 
             // Add to API history and save it
             this.apiHistory.push(apiRequest);
-            await this.saveApiHistory(); // Save in MessagePack format
+            // await this.saveApiHistory(); // Save in MessagePack format
 
             this.view?.postMessage({
                 command: 'receiveResponse',
@@ -108,36 +123,6 @@ export class ApiRequestProvider {
     private loadApiHistory() {
         // Load existing API history from global state if needed
         this.apiHistory = this.context.globalState.get('apiHistory', []);
-    }
-
-    private async saveApiHistory() {
-        try {
-            console.log("Saving API History...");
-
-            // Update global state with current API history
-            await this.context.globalState.update('apiHistory', this.apiHistory);
-
-            // Define file path for saving the API history
-            const folderPath = path.join(this.context.extensionPath, 'api_history');
-            
-            // Create directory if it doesn't exist
-            if (!fs.existsSync(folderPath)) {
-                fs.mkdirSync(folderPath);
-                console.log(`Created folder at ${folderPath}`);
-            }
-
-            // Define file path for the MessagePack file
-            const filePath = path.join(folderPath, 'history.msgpack');
-
-            // Write API history to MessagePack file
-            const packedData = msgpack.encode(this.apiHistory); // Encode data using MessagePack
-            fs.writeFileSync(filePath, packedData); // Write packed data to file
-            
-            vscode.window.showInformationMessage('API history saved successfully in MessagePack format!');
-        } catch (error) {
-            console.error('Error saving API history:', error); // Log any errors encountered
-            vscode.window.showErrorMessage(`Failed to save API history: ${error.message}`);
-        }
     }
 
     private loadCollections() {

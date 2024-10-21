@@ -20,7 +20,7 @@
 
     document.addEventListener('click', (event: MouseEvent) => {
         const target = event.target as HTMLElement;
-        
+    
         if (target.classList.contains('webview-button')) {
             const webviewType = target.getAttribute('data-webview');
             vscode.postMessage({ type: 'openApiManagement', value: webviewType });
@@ -32,7 +32,10 @@
             const endpoint = target.closest('.api-endpoint') as HTMLElement;
             const method = endpoint.querySelector('.method')?.textContent;
             const name = endpoint.querySelector('.name')?.textContent;
-            vscode.postMessage({ type: 'selectEndpoint', value: { method, name } });
+            console.log('Reloading Endpoint:', { method, name }); 
+            vscode.postMessage({ type: 'reloadEndpoint', value: { method, name } });
+        } else if (target.id === 'export-history-btn') {
+            vscode.postMessage({ type: 'exportApiHistory' });
         }
     });
 

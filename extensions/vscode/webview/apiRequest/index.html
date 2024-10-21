@@ -580,6 +580,25 @@
             case 'updateHistory':
                 updateHistory(message.history);
                 break;
+
+            case 'populateFields':
+                setMethod(message.method);
+                setUrl(message.url);
+                setHeaders(message.headers);
+                setBody(message.body);
+                break;
+            case 'setMethod':
+                document.getElementById('method-select').value = message.method; // Update method select element
+                break;
+            case 'setUrl':
+                document.getElementById('url-input').value = message.url; // Update URL input field
+                break;
+            case 'setHeaders':
+                document.getElementById('headers-input').value = JSON.stringify(message.headers, null, 2); // Update headers display/edit area
+                break;
+            case 'setBody':
+                document.getElementById('body-input').value = message.body; // Update body input field
+                break;
         }
     });
 

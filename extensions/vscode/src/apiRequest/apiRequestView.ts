@@ -27,7 +27,7 @@ export class ApiRequestView {
         } else {
             this.panel = vscode.window.createWebviewPanel(
                 'apiRequest',
-                'API Request',
+                'API Management',
                 vscode.ViewColumn.One,
                 {
                     enableScripts: true,
@@ -58,7 +58,7 @@ export class ApiRequestView {
                             ).catch(err => console.error("Error in API request callback:", err));
                             return;
                         case 'saveEndpoint':
-                            this.saveEndpoint(message.method, message.url);
+                            this.saveEndpoint(message.method, message.url, message.headers, message.body);
                             return;
                     }
                 },
@@ -76,22 +76,57 @@ export class ApiRequestView {
         this.panel?.webview.postMessage(message);
     }
 
-    private saveEndpoint(method: string, url: string) {
+    private saveEndpoint(method: string, url: string, headers: Record<string, string>, body: string) {
         // Check if the URL is blank
         if (!url.trim()) {
             vscode.window.showErrorMessage("URL is blank. Cannot save endpoint.");
             return;
         }
-
+    
         const endpoint: ApiEndpoint = {
             method: method,
             name: url,
-            lastUsed: new Date().toISOString()
+            lastUsed: new Date().toISOString(),
+            url: url, // Add URL property
+            headers: headers || {}, // Use provided headers or an empty object
+            body: body || '', // Use provided body or an empty string
         };
-
+    
         vscode.commands.executeCommand('vscode-api-client.updateApiHistory', endpoint);
     }
-    
+
+    public populateFields(endpoint: ApiEndpoint) {
+        // Send a message to the webview to populate fields with the endpoint data
+        this.postMessage({
+            command: 'populateFields',
+            method: endpoint.method,
+            url: endpoint.url,
+            headers: endpoint.headers,
+            body: endpoint.body
+        });
+    }
+
+    // New setter methods for populating fields
+    public setMethod(method: string) {
+        // Logic to set the method in your webview (e.g., update a dropdown)
+        this.postMessage({ command: 'setMethod', method });
+    }
+
+    public setUrl(url: string) {
+        // Logic to set the URL in your webview (e.g., update an input field)
+        this.postMessage({ command: 'setUrl', url });
+    }
+
+    public setHeaders(headers: Record<string, string>) {
+        // Logic to set headers in your webview (e.g., update a text area)
+        this.postMessage({ command: 'setHeaders', headers });
+    }
+
+    public setBody(body: string) {
+        // Logic to set the body in your webview (e.g., update a text area)
+        this.postMessage({ command: 'setBody', body });
+    }
+
     private async getWebviewContent(): Promise<string> {
         const htmlPath = vscode.Uri.joinPath(this.context.extensionUri, 'webview', 'apiRequest', 'index.html');
         console.log("Loading HTML from:", htmlPath.toString());
