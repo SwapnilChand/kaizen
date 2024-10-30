@@ -50,8 +50,8 @@ export class ApiRequestProvider {
 
     // Log the incoming parameters
     console.log("Parameters:", {
-      method,
       url,
+      method,
       headers,
       queryParams,
       formData,
@@ -108,8 +108,8 @@ export class ApiRequestProvider {
 
     try {
       const response = await this.httpClient.sendRequest(
-        urlObj.toString(),
         method,
+        urlObj.toString(),
         headers,
         requestBody
       );
