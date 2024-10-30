@@ -118,6 +118,14 @@ export class ApiRequestProvider {
       const responseTime = endTime - startTime;
       const responseSize = JSON.stringify(response).length;
 
+      console.log("Sending response to webview:", {
+        status: response.status,
+        headers: Object.keys(response.headers),
+        bodyLength: response.body.length,
+        time: responseTime,
+        size: responseSize,
+      });
+
       this.view?.postMessage({
         command: "receiveResponse",
         response: response,

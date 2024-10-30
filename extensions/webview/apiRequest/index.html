@@ -706,8 +706,14 @@
         const message = event.data;
         switch (message.command) {
           case "receiveResponse":
+            console.log("Webview received response message:", message);
+
             // Check if response exists
             if (message.response) {
+              console.log(
+                "Processing response with status:",
+                message.response.status
+              );
               const status =
                 message.response.status !== undefined
                   ? message.response.status
@@ -775,13 +781,17 @@
               // Format the response body if it's JSON
               let formattedBody = message.response.body;
               try {
+                console.log("Attempting to parse response as JSON");
                 const jsonBody = JSON.parse(message.response.body);
                 formattedBody = formatJSON(JSON.stringify(jsonBody, null, 2));
+                console.log("Successfully parsed and formatted JSON");
               } catch (e) {
                 // If parsing fails, it's not JSON, so we'll display it as is
+                console.log("Response is not JSON, using raw body");
               }
 
               // Clear previous response content
+              console.log("Creating response view iframe");
               const responseElement = document.getElementById("response");
               responseElement.innerHTML = "";
 
@@ -792,6 +802,7 @@
               responseElement.appendChild(responseView);
 
               // Handle headers similarly
+              console.log("Creating headers view iframe");
               const headersElement =
                 document.getElementById("response-headers");
               headersElement.innerHTML = "";
@@ -801,8 +812,10 @@
                 )}</pre>`
               );
               headersElement.appendChild(headersView);
+
+              console.log("Response rendering complete");
             } else {
-              console.error("Response object is missing");
+              console.error("Response object is missing from message");
             }
             break;
           case "updateHistory":
@@ -826,11 +839,28 @@
       });
 
       function loadEndpoint(endpoint) {
-        document.getElementById("method").value = endpoint.method;
-        document.getElementById("url").value = endpoint.name;
-        // You might need to add more logic here to load other endpoint details
-        // such as headers, query params, body, etc., depending on what data
-        // you're storing in the ApiEndpoint object
+        console.log("Loading endpoint in webview:", endpoint);
+        try {
+          if (!endpoint || !endpoint.method || !endpoint.name) {
+            console.error("Invalid endpoint data received:", endpoint);
+            return;
+          }
+
+          const methodElement = document.getElementById("method");
+          const urlElement = document.getElementById("url");
+
+          if (!methodElement || !urlElement) {
+            console.error("Required DOM elements not found");
+            return;
+          }
+
+          methodElement.value = endpoint.method;
+          urlElement.value = endpoint.name;
+
+          console.log("Endpoint loaded successfully in UI");
+        } catch (error) {
+          console.error("Error loading endpoint in UI:", error);
+        }
       }
     </script>
   </body>
