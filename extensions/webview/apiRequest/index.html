@@ -25,7 +25,6 @@
         padding: 20px;
         display: flex;
         flex-direction: column;
-        overflow-y: auto;
       }
       .response-panel {
         border-left: 1px solid var(--vscode-panel-border);
@@ -497,6 +496,7 @@
       methodSelect.addEventListener("change", function () {
         this.className = "method-select method-" + this.value;
       });
+
       // Initialize the color
       methodSelect.className = "method-select method-" + methodSelect.value;
 
@@ -633,6 +633,14 @@
         });
       });
 
+      //Listen to button Press ENter key for Send Event click trigger
+      document
+        .getElementById("url")
+        .addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            document.getElementById("send").click(); // Trigger the button click
+          }
+        });
       // Add this new function to format JSON
       function formatJSON(json) {
         if (typeof json !== "string") {

@@ -219,13 +219,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     return `
         <div id="tabs">
             <div class="tab-buttons">
-                <span class="tab-button active" onclick="showTab('env')">Environments</span>
                 <span class="tab-button" onclick="showTab('collections')">Collections</span>
-                <span class="tab-button" onclick="showTab('history')">History</span>
+                <span class="tab-button" onclick="showTab('env')">Environments</span>
+                <span class="tab-button active" onclick="showTab('history')">History</span>
             </div>
-            <div id="env" class="tab active">${this.getEnvironmentHtml()}</div>
             <div id="collections" class="tab">${this.getCollectionsHtml()}</div>
-            <div id="history" class="tab">${this.getHistoryHtml()}</div>
+            <div id="env" class="tab">${this.getEnvironmentHtml()}</div>
+            <div id="history" class="tab active">${this.getHistoryHtml()}</div>
         </div>
 
         <script>
@@ -253,10 +253,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   }
   private getHistoryHtml() {
     return `
-      <div id="history-header">
-        <button id="export-history-btn">Export</button>
-        <button id="add-button">+</button>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.css">
+      <div id="header">
         <input type="text" id="filter-history" placeholder="Filter">
+        <button id="export-history-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-input"><path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1"/><path d="M2 13h10"/><path d="m9 16 3-3-3-3"/></svg>
+        </button>
+        <div class="hover-text">Export history</div>
       </div>
       <ul id="api-history">
         ${this.apiHistory
@@ -288,8 +291,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   }
   private getCollectionsHtml() {
     return `
-    <div id="collections-header">
-      <button id="add-button">+</button>
+    <div id="header">
+      <button id="add-button"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
       <input type="text" id="filter-history" placeholder="Filter">
     </div>
     <ul id="api-history">
@@ -323,8 +326,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   private getEnvironmentHtml() {
     return `
-      <div id="env-header">
-      <button id="add-button">+</button>
+      <div id="header">
+      <button id="add-button"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
         <input type="text" id="filter-history" placeholder="Filter">
       </div>
       <ul id="api-history">
@@ -377,7 +380,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           localResourceRoots: [this._extensionUri],
         }
       );
-
       panel.webview.html = await this.getWebviewContent(webviewType);
     }
   }
