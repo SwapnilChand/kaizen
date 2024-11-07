@@ -1,302 +1,401 @@
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    margin: 0;
-    padding: 10px 0; /* Added top and bottom padding */
-    color: var(--vscode-foreground);
-    background-color: var(--vscode-sideBar-background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 10px 0;
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-sideBar-background);
 }
 
 #sidebar-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 #collections-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    background-color: var(--vscode-sideBarSectionHeader-background);
-    border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--vscode-sideBarSectionHeader-background);
+  border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
 }
 
 #collections-header h3 {
-    margin: 0;
-    font-size: 11px;
-    text-transform: uppercase;
-    font-weight: 600;
-    color: var(--vscode-sideBarSectionHeader-foreground);
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--vscode-sideBarSectionHeader-foreground);
 }
 
 #new-request-btn {
-    background-color: var(--vscode-button-background);
-    color: var(--vscode-button-foreground);
-    border: none;
-    border-radius: 3px;
-    padding: 6px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.2s ease;
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  border-radius: 3px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
+  margin: 10px;
+  width: 100%;
+  justify-content: center;
 }
 
 #new-request-btn:hover {
-    background-color: var(--vscode-button-hoverBackground);
+  background-color: var(--vscode-button-hoverBackground);
 }
 
 #new-request-btn::before {
-    content: '+';
-    margin-right: 5px;
-    font-size: 14px;
-    font-weight: bold;
+  content: "+";
+  margin-right: 5px;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 #export-history-btn {
-    background-color: white;
-    color: black;
-    border: none;
-    border-radius: 3px;
-    padding: 6px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.2s ease;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 3px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
 }
 
 #export-history-btn:hover {
-    background-color: rgb(206, 206, 206);
+  background-color: rgb(206, 206, 206);
 }
 
 #export-history-btn::before {
-    margin-right: 5px;
-    font-size: 14px;
-    font-weight: bold;
+  margin-right: 5px;
+  font-size: 14px;
+  font-weight: bold;
 }
 
-
 #filter-collections {
-    margin: 10px 16px; /* Increased margin */
-    padding: 6px 10px; /* Increased padding */
-    background-color: var(--vscode-input-background);
-    color: var(--vscode-input-foreground);
-    border: 1px solid var(--vscode-input-border);
-    font-size: 12px;
-    width: calc(100% - 32px); /* Adjusted for increased margin */
-    box-sizing: border-box;
+  margin: 10px 16px; /* Increased margin */
+  padding: 6px 10px; /* Increased padding */
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  font-size: 12px;
+  width: calc(100% - 32px); /* Adjusted for increased margin */
+  box-sizing: border-box;
 }
 
 #api-endpoints {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    overflow-y: auto;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
 }
 
 .api-endpoint {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 5px 10px;
-    position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5px 10px;
+  position: relative;
 }
 
 .api-endpoint:hover {
-    background-color: var(--vscode-list-hoverBackground);
+  background-color: var(--vscode-list-hoverBackground);
 }
 
 .api-endpoint .method {
-    margin-right: 10px;
-    font-weight: bold;
-    padding: 2px 6px;
-    border-radius: 3px;
+  margin-right: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 3px;
 }
 
-.api-endpoint.get .method { background-color: #61affe; color: #fff; }
-.api-endpoint.post .method { background-color: #49cc90; color: #fff; }
-.api-endpoint.put .method { background-color: #fca130; color: #fff; }
-.api-endpoint.delete .method { background-color: #f93e3e; color: #fff; }
-.api-endpoint.patch .method { background-color: #50e3c2; color: #fff; }
+.api-endpoint.get .method {
+  background-color: #61affe;
+  color: #fff;
+}
+.api-endpoint.post .method {
+  background-color: #49cc90;
+  color: #fff;
+}
+.api-endpoint.put .method {
+  background-color: #fca130;
+  color: #fff;
+}
+.api-endpoint.delete .method {
+  background-color: #f93e3e;
+  color: #fff;
+}
+.api-endpoint.patch .method {
+  background-color: #50e3c2;
+  color: #fff;
+}
 
 .api-endpoint .name {
-    flex-grow: 1;
-    font-size: 13px;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-right: 10px;
+  flex-grow: 1;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 10px;
 }
 
 .api-endpoint .last-used {
-    font-size: 11px;
-    color: var(--vscode-descriptionForeground);
-    margin-right: 10px;
-    white-space: nowrap;
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  margin-right: 10px;
+  white-space: nowrap;
 }
 
 #buttons {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
-.webview-button, #back-button {
-    background-color: transparent;
-    color: var(--vscode-sideBarTitle-foreground);
-    border: none;
-    padding: 10px 16px; /* Increased padding */
-    font-size: 13px;
-    font-weight: 500; /* Made text slightly bolder */
-    cursor: pointer;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: background-color 0.2s ease;
+.webview-button,
+#back-button {
+  background-color: transparent;
+  color: var(--vscode-sideBarTitle-foreground);
+  border: none;
+  padding: 10px 16px; /* Increased padding */
+  font-size: 13px;
+  font-weight: 500; /* Made text slightly bolder */
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s ease;
 }
 
-.webview-button:hover, #back-button:hover {
-    background-color: var(--vscode-list-hoverBackground);
+.webview-button:hover,
+#back-button:hover {
+  background-color: var(--vscode-list-hoverBackground);
 }
 
-.webview-button:focus, #back-button:focus {
-    outline: none;
-    background-color: var(--vscode-list-focusBackground);
+.webview-button:focus,
+#back-button:focus {
+  outline: none;
+  background-color: var(--vscode-list-focusBackground);
 }
 
 .webview-button.active {
-    background-color: var(--vscode-list-activeSelectionBackground);
-    color: var(--vscode-list-activeSelectionForeground);
-    font-weight: 600; /* Made active button text even bolder */
+  background-color: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+  font-weight: 600; /* Made active button text even bolder */
 }
 
 #back-button {
-    font-weight: 600; /* Made back button text bolder */
-    margin-bottom: 8px;
-    /* Removed border-bottom */
+  font-weight: 600; /* Made back button text bolder */
+  margin-bottom: 8px;
+  /* Removed border-bottom */
 }
 
 #back-button::before {
-    content: '←';
-    margin-right: 8px;
+  content: "←";
+  margin-right: 8px;
+}
+#tabs {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.tab-buttons {
+  display: flex;
+  width: 100%;
+}
+.tab-button {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  background-color: var(--vscode-sideBarTitle-background);
+  color: white;
+  cursor: pointer; /* Pointer cursor on hover */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+.tab-button.active {
+  background-color: var(--vscode-list-activeSelectionBackground);
+}
+.tab-button:hover {
+  background-color: var(--vscode-list-focusBackground);
+}
+.tab {
+  display: none; /* Hide all tabs by default */
+  width: 100%; /* Full width for tab content */
+}
+.tab.active {
+  display: block; /* Show only active tab */
 }
 
+#add-button {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  border-radius: 3px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
+  margin: 10px;
+  justify-content: center;
+}
 #history-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    background-color: var(--vscode-sideBarSectionHeader-background);
-    border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--vscode-sideBarSectionHeader-background);
+  border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
 }
 
 #history-header h3 {
-    margin: 0;
-    font-size: 11px;
-    text-transform: uppercase;
-    font-weight: 600;
-    color: var(--vscode-sideBarSectionHeader-foreground);
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--vscode-sideBarSectionHeader-foreground);
+}
+
+#env-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--vscode-sideBarSectionHeader-background);
+  border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+}
+
+#env-header h3 {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--vscode-sideBarSectionHeader-foreground);
+}
+
+#collection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--vscode-sideBarSectionHeader-background);
+  border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+}
+
+#collection-header h3 {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--vscode-sideBarSectionHeader-foreground);
 }
 
 #filter-history {
-    margin: 10px 16px;
-    padding: 6px 10px;
-    background-color: var(--vscode-input-background);
-    color: var(--vscode-input-foreground);
-    border: 1px solid var(--vscode-input-border);
-    font-size: 12px;
-    width: calc(100% - 32px);
-    box-sizing: border-box;
+  margin: 10px 16px;
+  padding: 6px 10px;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  font-size: 12px;
+  width: calc(100% - 32px);
+  box-sizing: border-box;
 }
 
 #api-history {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    overflow-y: auto;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
 }
 
 .history-panel {
-    flex: 1;
-    padding: 20px;
-    border-right: 1px solid var(--vscode-panel-border);
-    overflow-y: auto;
+  flex: 1;
+  padding: 20px;
+  border-right: 1px solid var(--vscode-panel-border);
+  overflow-y: auto;
 }
 
 #history-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
 .history-item {
-    display: flex;
-    align-items: center;
-    padding: 8px 0;
-    cursor: pointer;
-    border-bottom: 1px solid var(--vscode-panel-border);
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  cursor: pointer;
+  border-bottom: 1px solid var(--vscode-panel-border);
 }
 
 .history-item:hover {
-    background-color: var(--vscode-list-hoverBackground);
+  background-color: var(--vscode-list-hoverBackground);
 }
 
 .history-item .method {
-    font-weight: bold;
-    margin-right: 10px;
-    padding: 2px 6px;
-    border-radius: 3px;
+  font-weight: bold;
+  margin-right: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
 }
 
 .history-item .url {
-    flex-grow: 1;
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  flex-grow: 1;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .history-item .status {
-    margin-right: 10px;
-    font-size: 12px;
+  margin-right: 10px;
+  font-size: 12px;
 }
 
 .history-item .time {
-    font-size: 11px;
-    color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
 }
 
 .delete-btn {
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 10px;
-    line-height: 1;
-    cursor: pointer;
-    opacity: 0.6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.2s ease;
-    flex-shrink: 0;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
 }
 
 .delete-btn:hover {
-    background-color: #ff1a1a;
+  background-color: #ff1a1a;
 }
 
 .delete-btn .codicon {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .api-endpoint {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }

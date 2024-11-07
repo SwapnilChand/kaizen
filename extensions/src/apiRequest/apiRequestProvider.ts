@@ -118,23 +118,32 @@ export class ApiRequestProvider {
       const responseTime = endTime - startTime;
       const responseSize = JSON.stringify(response).length;
 
+      console.log("View instance check:", {
+        viewExists: !!this.view,
+      });
+
+      if (!this.view) {
+        console.error("View instance is missing");
+        return;
+      }
+
       console.log("Sending response to webview:", {
         status: response.status,
-        headers: Object.keys(response.headers),
-        bodyLength: response.body.length,
         time: responseTime,
         size: responseSize,
       });
 
-      this.view?.postMessage({
+      await this.view.postMessage({
         command: "receiveResponse",
         response: response,
         time: responseTime,
         size: responseSize,
       });
     } catch (error) {
-      console.error("Error sending request:", error); // Log the error details
-      vscode.window.showErrorMessage(`Error sending request: ${error.message}`);
+      console.error("Error in handleApiRequest while sending request:", error); // Log the error details
+      vscode.window.showErrorMessage(
+        `Error handling request: ${error.message}`
+      );
     }
   }
 
@@ -163,14 +172,17 @@ export class ApiRequestProvider {
   }
 
   private loadCollections() {
+    console.log("api Request view : loadCollections called");
     this.collections = this.context.globalState.get("apiCollections", []);
   }
 
   private saveCollections() {
+    console.log("api Request view : saveCollections called");
     this.context.globalState.update("apiCollections", this.collections);
   }
 
   private updateCollectionsView() {
+    console.log("updated Collections called");
     this.view?.postMessage({
       command: "updateCollections",
       collections: this.collections,

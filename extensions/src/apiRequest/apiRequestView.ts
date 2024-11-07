@@ -17,7 +17,7 @@ type ApiRequestCallback = (
 export class ApiRequestView {
   private panel: vscode.WebviewPanel | undefined;
   private context: vscode.ExtensionContext;
-  private apiRequestCallback: ApiRequestCallback;
+  private apiRequestCallback: ApiRequestCallback; //for handleApiRequest from the ApiRequestProvider
 
   constructor(
     context: vscode.ExtensionContext,
@@ -27,50 +27,6 @@ export class ApiRequestView {
     this.apiRequestCallback = apiRequestCallback;
   }
 
-  //   public async show() {
-  //     console.log("Show from View");
-  //     this.panel = vscode.window.createWebviewPanel(
-  //       "apiRequest",
-  //       "API Request",
-  //       vscode.ViewColumn.One,
-  //       {
-  //         enableScripts: true,
-  //         retainContextWhenHidden: true,
-  //       }
-  //     );
-  //     const content = await this.getWebviewContent();
-  //     console.log("Webview Content:", content);
-  //     this.panel.webview.html = content;
-
-  //     this.panel.webview.onDidReceiveMessage(
-  //       (message) => {
-  //         console.log("Message received from webview:", message); // Log incoming messages
-  //         switch (message.command) {
-  //           case "sendRequest":
-  //             this.apiRequestCallback(
-  //               message.method,
-  //               message.url,
-  //               message.headers,
-  //               message.queryParams,
-  //               message.formData,
-  //               message.body,
-  //               message.bodyType
-  //             );
-  //             return;
-  //           case "saveEndpoint":
-  //             this.saveEndpoint(message.method, message.url);
-  //             return;
-  //         }
-  //       },
-  //       undefined,
-  //       this.context.subscriptions
-  //     );
-
-  //     this.panel.onDidDispose(() => {
-  //       console.log("Webview panel disposed");
-  //       this.panel = undefined;
-  //     });
-  //   }
   public async show() {
     try {
       console.log("Show from View: Initializing");
@@ -162,9 +118,24 @@ export class ApiRequestView {
     }
   }
 
-  public postMessage(message: any) {
-    this.panel?.webview.postMessage(message);
+  public async postMessage(message: any) {
+    console.log(
+      "ApiRequestView.postMessage called; Attempting to post message to webview:",
+      message.command
+    );
+    if (!this.panel) {
+      console.error("No panel available for postMessage");
+      return;
+    }
+    try {
+      await this.panel.webview.postMessage(message);
+      console.log("Message successfully posted to webview");
+    } catch (error) {
+      console.error("Error posting message to webview:", error);
+      throw error;
+    }
   }
+
   private saveEndpoint(method: string, url: string) {
     if (!url.trim()) {
       vscode.window.showErrorMessage("URL is blank. Cannot save endpoint.");
@@ -206,16 +177,6 @@ export class ApiRequestView {
     });
   }
 
-  //   public loadEndpoint(endpoint: ApiEndpoint) {
-  //     console.log("Loading Endpoint");
-  //     if (this.panel) {
-  //       this.panel.webview.postMessage({
-  //         command: "loadEndpoint",
-  //         endpoint: endpoint,
-  //       });
-  //       console.log(this.panel.webview.postMessage);
-  //     }
-  //   }
   public async loadEndpoint(endpoint: ApiEndpoint) {
     try {
       console.log("Loading Endpoint:", endpoint);
