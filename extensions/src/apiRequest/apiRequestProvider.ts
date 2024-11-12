@@ -3,10 +3,10 @@ import { ApiRequestView } from "./apiRequestView";
 import { HttpClient } from "../utils/httpClient";
 import { ApiEndpoint } from "../types";
 
-interface Collection {
-  name: string;
-  requests: ApiRequest[];
-}
+// interface Collection {
+//   name: string;
+//   requests: ApiRequest[];
+// }
 
 interface ApiRequest {
   name: string;
