@@ -163,9 +163,9 @@ export class ApiRequestProvider {
   // }
 
   public loadEndpoint(endpoint: ApiEndpoint) {
-    console.log("API endpoint loaded", endpoint);
     if (this.view) {
       this.view.loadEndpoint(endpoint);
     }
+    console.log("API endpoint loaded", endpoint);
   }
 }

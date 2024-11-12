@@ -515,37 +515,38 @@
       });
 
       // Modify addRow function
-      // function addRow(button, tableId) {
-      //   const table = document.getElementById(tableId);
-      //   const row = button.closest("tr");
-      //   const newRow = row.cloneNode(true);
-      //   newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
-      //   const actionButton = newRow.querySelector(".action-button");
-      //   actionButton.textContent = "-";
-      //   actionButton.onclick = function () {
-      //     removeRow(this);
-      //   };
-      //   table.appendChild(newRow);
-      // }
-
-      function addRow(tableId) {
+      function addRow(button, tableId) {
+        console.log("Inside add row");
         const table = document.getElementById(tableId);
-        if (!table) {
-          console.error(`Table with id "${tableId}" not found`);
-          return;
-        }
-        const lastRow = table.rows[table.rows.length - 1];
-        const newRow = lastRow.cloneNode(true);
+        const row = button.closest("tr");
+        const newRow = row.cloneNode(true);
         newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
         const actionButton = newRow.querySelector(".action-button");
-        if (actionButton) {
-          actionButton.textContent = "-";
-          actionButton.onclick = function () {
-            removeRow(this);
-          };
-        }
+        actionButton.textContent = "-";
+        actionButton.onclick = function () {
+          removeRow(this);
+        };
         table.appendChild(newRow);
       }
+
+      // function addRow(tableId) {
+      //   const table = document.getElementById(tableId);
+      //   if (!table) {
+      //     console.error(`Table with id "${tableId}" not found`);
+      //     return;
+      //   }
+      //   const lastRow = table.rows[table.rows.length - 1];
+      //   const newRow = lastRow.cloneNode(true);
+      //   newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
+      //   const actionButton = newRow.querySelector(".action-button");
+      //   if (actionButton) {
+      //     actionButton.textContent = "-";
+      //     actionButton.onclick = function () {
+      //       removeRow(this);
+      //     };
+      //   }
+      //   table.appendChild(newRow);
+      // }
 
       // Modify removeRow function
       function removeRow(button) {
@@ -824,16 +825,6 @@
         }
       });
 
-      // document.getElementById("save").addEventListener("click", () => {
-      //   const method = document.getElementById("method").value;
-      //   const url = document.getElementById("url").value.trim();
-
-      //   vscode.postMessage({
-      //     command: "saveEndpoint",
-      //     method,
-      //     url,
-      //   });
-      // });
       document.getElementById("save").addEventListener("click", () => {
         const method = document.getElementById("method").value;
         const url = document.getElementById("url").value.trim();
@@ -880,19 +871,13 @@
         });
       });
 
-      // function loadEndpoint(endpoint) {
-      //   console.log("Loading endpoint: index.html");
-      //   document.getElementById("method").value = endpoint.method;
-      //   document.getElementById("url").value = endpoint.name;
-      //   document.getElementById("query-params").value = endpoint.queryParams;
-      // }
       function loadEndpoint(endpoint) {
+        console.log("\n-----------Load endpoint called\n-----------");
         document.getElementById("method").value = endpoint.method;
         document.getElementById("url").value = endpoint.name;
 
         // Load query parameters
         const queryParamsTable = document.getElementById("query-params");
-        clearTableRows(queryParamsTable);
         for (const [key, value] of Object.entries(endpoint.queryParams)) {
           addRow(
             queryParamsTable.querySelector(".action-button"),
@@ -904,28 +889,22 @@
           inputs[0].value = key;
           inputs[1].value = value;
         }
-
-        // Load headers
-        // const headersTable = document.getElementById("headers-table");
-        // clearTableRows(headersTable);
-        // for (const [key, value] of Object.entries(endpoint.headers)) {
-        //   addRow(headersTable.querySelector(".action-button"), "headers-table");
-        //   const inputs = headersTable.querySelectorAll("tr:last-child input");
-        //   inputs[0].value = key;
-        //   inputs[1].value = value;
-        // }
+        console.log("\nquery params called");
         const headersTable = document.getElementById("headers-table");
-        clearTableRows(headersTable);
+        // clearTableRows(headersTable);
         for (const [key, value] of Object.entries(endpoint.headers)) {
           addRow("headers-table");
           const inputs = headersTable.querySelectorAll("tr:last-child input");
           inputs[0].value = key;
           inputs[1].value = value;
         }
+        console.log("\nheaders called");
+
         // Load auth
         const authTypeSelect = document.getElementById("auth-type");
         authTypeSelect.value = endpoint.auth.type;
         updateAuthFields(endpoint.auth.type, endpoint.auth.data);
+        console.log("\nAuth called");
 
         // Load body
         const bodyTypeRadios = document.querySelectorAll(
@@ -939,7 +918,7 @@
         bodyContentTextarea.value = endpoint.body;
 
         const formDataTable = document.getElementById("form-data");
-        clearTableRows(formDataTable);
+        // clearTableRows(formDataTable);
         for (const [key, value] of Object.entries(endpoint.formData)) {
           addRow(formDataTable.querySelector(".action-button"), "form-data");
           const inputs = formDataTable.querySelectorAll("tr:last-child input");
@@ -949,13 +928,17 @@
 
         handleBodyTypeChange();
       }
-      //
-      function clearTableRows(table) {
-        table.querySelectorAll("tr:not(:first-child)").forEach((row) => {
-          row.remove();
-        });
-      }
-      //
+
+      // function clearTableRows(table) {
+      //   console.log("\nclear table rows in");
+      //   console.log("tables before", table);
+      //   table.querySelectorAll("tr:not(:first-child)").forEach((row) => {
+      //     row.remove();
+      //   });
+      //   console.log("tables after clear table rows", table);
+      //   console.log("\nclear table rows out");
+      // }
+
       function updateAuthFields(authType, authData) {
         document.getElementById("basic-auth").style.display =
           authType === "basic" ? "block" : "none";
