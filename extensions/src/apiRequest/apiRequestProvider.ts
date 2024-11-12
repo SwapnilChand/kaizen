@@ -20,7 +20,7 @@ export class ApiRequestProvider {
   private context: vscode.ExtensionContext;
   private view: ApiRequestView | undefined;
   private httpClient: HttpClient;
-  private collections: Collection[] = [];
+  // private collections: Collection[] = [];
   // private environment: Record<string, string> = {};
 
   constructor(context: vscode.ExtensionContext) {
