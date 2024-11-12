@@ -1,13 +1,13 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as msgpack from 'msgpack-lite'; 
-import * as vscode from 'vscode';
-import { ApiRequestProvider } from './apiRequest/apiRequestProvider';
-import { log } from './extension';
-import { ApiEndpoint } from './types';
-import { inspect } from 'util';
-import { ApiRequestView } from './apiRequest/apiRequestView';
-import { HttpClient } from './utils/httpClient';
+import * as fs from "fs";
+import * as path from "path";
+import * as msgpack from "msgpack-lite";
+import * as vscode from "vscode";
+import { ApiRequestProvider } from "./apiRequest/apiRequestProvider";
+import { log } from "./extension";
+import { ApiEndpoint } from "./types";
+import { inspect } from "util";
+import { ApiRequestView } from "./apiRequest/apiRequestView";
+import { HttpClient } from "./utils/httpClient";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
@@ -18,7 +18,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   private context: vscode.ExtensionContext;
   private httpClient: HttpClient;
 
-  constructor(private readonly _extensionUri: vscode.Uri, context: vscode.ExtensionContext) {
+  constructor(
+    private readonly _extensionUri: vscode.Uri,
+    context: vscode.ExtensionContext
+  ) {
     this.apiRequestProvider = new ApiRequestProvider(context);
     this.context = context;
     this.loadApiHistory();
@@ -30,51 +33,64 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     // Register command to update API history
     context.subscriptions.push(
-      vscode.commands.registerCommand('vscode-api-client.updateApiHistory', (endpoint: ApiEndpoint) => {
-        this.updateApiHistory(endpoint);
-      })
+      vscode.commands.registerCommand(
+        "vscode-api-client.updateApiHistory",
+        (endpoint: ApiEndpoint) => {
+          this.updateApiHistory(endpoint);
+        }
+      )
     );
   }
   private loadApiHistory() {
     try {
-      const history = this.context.globalState.get<ApiEndpoint[]>('apiHistory', []);
+      const history = this.context.globalState.get<ApiEndpoint[]>(
+        "apiHistory",
+        []
+      );
       this.apiHistory = history;
     } catch (error) {
-      console.error('Error loading API history:', error);
+      console.error("Error loading API history:", error);
       this.apiHistory = [];
     }
   }
 
   private saveApiHistory() {
     try {
-      this.context.globalState.update('apiHistory', this.apiHistory);
+      this.context.globalState.update("apiHistory", this.apiHistory);
     } catch (error) {
-      console.error('Error saving API history:', error);
-      vscode.window.showErrorMessage('Failed to save API history. Please try again.');
+      console.error("Error saving API history:", error);
+      vscode.window.showErrorMessage(
+        "Failed to save API history. Please try again."
+      );
     }
   }
   private async exportHistory() {
     try {
-        console.log("Exporting API history...");
-        
-        const downloadsFolder = process.platform === 'darwin' 
-            ? path.join(process.env.HOME, 'Downloads') 
-            : path.join(process.env.USERPROFILE, 'Downloads');
+      console.log("Exporting API history...");
 
-        const filePath = path.join(downloadsFolder, 'history.msgpack');
-        const packedData = msgpack.encode(this.apiHistory); 
-        fs.writeFileSync(filePath, packedData); 
+      const downloadsFolder =
+        process.platform === "darwin"
+          ? path.join(process.env.HOME, "Downloads")
+          : path.join(process.env.USERPROFILE, "Downloads");
 
-        vscode.window.showInformationMessage(`API History Exported to: ${filePath}`);
+      const filePath = path.join(downloadsFolder, "history.msgpack");
+      const packedData = msgpack.encode(this.apiHistory);
+      fs.writeFileSync(filePath, packedData);
+
+      vscode.window.showInformationMessage(
+        `API History Exported to: ${filePath}`
+      );
     } catch (error) {
-        console.error('Error saving API history:', error);
-        vscode.window.showErrorMessage(`Failed to save API history: ${error.message}`);
+      console.error("Error saving API history:", error);
+      vscode.window.showErrorMessage(
+        `Failed to save API history: ${error.message}`
+      );
     }
-  } 
+  }
 
   public refresh() {
     if (this._view) {
-      console.log('Refreshing webview content');
+      console.log("Refreshing webview content");
       this._view.webview.html = this._getHtmlForWebview(this._view.webview);
     }
   }
@@ -89,6 +105,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
+      console.log("\n\n\n");
       log("Received message on sidebar");
       switch (data.type) {
         case "onInfo": {
@@ -106,7 +123,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "openApiManagement": {
-
           if (!data.value) {
             return;
           }
@@ -127,6 +143,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "selectEndpoint": {
+          console.log("Selected endpoint. This is data.value", data.value);
           this.loadEndpoint(data.value);
           break;
         }
@@ -153,7 +170,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this._extensionUri, "media", "sidebar.css")
     );
 
-
     const nonce = getNonce();
 
     const csp = `
@@ -173,16 +189,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         <link href="${styleSidebarUri}" rel="stylesheet">
     </head>
     <body>
-    ${this.showHistory
+    ${
+      this.showHistory
         ? `<button id="back-button">Back</button>${this.getHistoryHtml()}`
         : `<div id="buttons">
            <button class="webview-button" data-webview="apiManagement">API Management</button>
-           <button class="webview-button" data-webview="apiRequest">API Documentation [Coming Soon]</button>
-           <button class="webview-button" data-webview="documentation">Documentation [Coming Soon]</button>
-           <button class="webview-button" data-webview="testCase">Test Management [Coming Soon]</button>
-           <button class="webview-button" data-webview="codeReview">Code Review [Coming Soon]</button>
          </div>`
-      }
+    }
     <script nonce="${nonce}" src="${scriptUri}"></script>
     </body>
     </html>`;
@@ -198,26 +211,37 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         </div>
         <input type="text" id="filter-history" placeholder="Filter history">
         <ul id="api-history">
-          ${this.apiHistory.map(endpoint => {
-            if (!endpoint || !endpoint.method || !endpoint.name || !endpoint.lastUsed) {
-              return '';
-            }
-            return `
+          ${this.apiHistory
+            .map((endpoint) => {
+              if (
+                !endpoint ||
+                !endpoint.method ||
+                !endpoint.name ||
+                !endpoint.lastUsed
+              ) {
+                return "";
+              }
+              return `
               <li class="api-endpoint ${endpoint.method.toLowerCase()}">
                 <span class="method">${endpoint.method}</span>
                 <span class="name">${endpoint.name}</span>
-                <span class="last-used">${new Date(endpoint.lastUsed).toLocaleString()}</span>
-                <button class="delete-btn" data-name="${endpoint.name}" data-method="${endpoint.method}">X</button>
+                <span class="last-used">${new Date(
+                  endpoint.lastUsed
+                ).toLocaleString()}</span>
+                <button class="delete-btn" data-name="${
+                  endpoint.name
+                }" data-method="${endpoint.method}">X</button>
               </li>
             `;
-          }).join('')}
+            })
+            .join("")}
         </ul>
       </div>
     `;
   }
 
   private async openWebview(webviewType: string) {
-    if (webviewType === 'apiManagement') {
+    if (webviewType === "apiManagement") {
       if (this.apiRequestProvider) {
         this.apiRequestProvider.openApiRequestView();
         this.showHistory = true;
@@ -252,40 +276,50 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   private getWebviewTitle(webviewType: string): string {
     switch (webviewType) {
-      case 'apiManagement':
-        return 'API Management';
-      case 'apiRequest':
-        return 'API Request';
-      case 'chatRepo':
-        return 'Chat Repo';
-      case 'documentation':
-        return 'Documentation';
-      case 'codeReview':
-        return 'Code Review';
-      case 'testCase':
-        return 'Test Case';
+      case "apiManagement":
+        return "API Management";
+      case "apiRequest":
+        return "API Request";
+      case "chatRepo":
+        return "Chat Repo";
+      case "documentation":
+        return "Documentation";
+      case "codeReview":
+        return "Code Review";
+      case "testCase":
+        return "Test Case";
       default:
-        return 'Webview';
+        return "Webview";
     }
   }
 
   private async getWebviewContent(webviewType: string): Promise<string> {
-    const filePath = vscode.Uri.joinPath(this._extensionUri, webviewType, 'index.html');
+    const filePath = vscode.Uri.joinPath(
+      this._extensionUri,
+      webviewType,
+      "index.html"
+    );
     const fileContent = await vscode.workspace.fs.readFile(filePath);
     return fileContent.toString();
   }
   private updateApiHistory(endpoint: ApiEndpoint) {
     const existingIndex = this.apiHistory.findIndex(
-        e => e.name === endpoint.name && e.method === endpoint.method
+      (e) => e.name === endpoint.name && e.method === endpoint.method
     );
 
     if (existingIndex !== -1) {
-        this.apiHistory[existingIndex] = { ...endpoint, lastUsed: new Date().toISOString() };
-        const [updatedEndpoint] = this.apiHistory.splice(existingIndex, 1);
-        this.apiHistory.unshift(updatedEndpoint);
+      this.apiHistory[existingIndex] = {
+        ...endpoint,
+        lastUsed: new Date().toISOString(),
+      };
+      const [updatedEndpoint] = this.apiHistory.splice(existingIndex, 1);
+      this.apiHistory.unshift(updatedEndpoint);
     } else {
-        this.apiHistory.unshift({ ...endpoint, lastUsed: new Date().toISOString() });
-        this.apiHistory = this.apiHistory.slice(0, 10);
+      this.apiHistory.unshift({
+        ...endpoint,
+        lastUsed: new Date().toISOString(),
+      });
+      this.apiHistory = this.apiHistory.slice(0, 10);
     }
 
     this.saveApiHistory();
@@ -295,35 +329,46 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   private deleteEndpoint(name: string, method: string) {
     const initialLength = this.apiHistory.length;
     this.apiHistory = this.apiHistory.filter(
-      endpoint => endpoint && endpoint.name && endpoint.method &&
-      !(endpoint.name === name && endpoint.method === method)
+      (endpoint) =>
+        endpoint &&
+        endpoint.name &&
+        endpoint.method &&
+        !(endpoint.name === name && endpoint.method === method)
     );
-    
+
     if (this.apiHistory.length < initialLength) {
       this.saveApiHistory();
       this.refresh();
-      vscode.window.showInformationMessage(`Endpoint ${method} ${name} deleted successfully.`);
+      vscode.window.showInformationMessage(
+        `Endpoint ${method} ${name} deleted successfully.`
+      );
     } else {
-      vscode.window.showWarningMessage(`Failed to delete endpoint ${method} ${name}. It may not exist or be invalid.`);
+      vscode.window.showWarningMessage(
+        `Failed to delete endpoint ${method} ${name}. It may not exist or be invalid.`
+      );
     }
   }
 
   private inspectApiHistory() {
-    console.log('Inspecting API History:');
+    console.log("Inspecting API History:");
     this.apiHistory.forEach((item, index) => {
-      console.log(`Item ${index}:`, inspect(item, { depth: null, colors: true }));
+      console.log(
+        `Item ${index}:`,
+        inspect(item, { depth: null, colors: true })
+      );
     });
   }
 
   private cleanupApiHistory() {
     const initialLength = this.apiHistory.length;
-    this.apiHistory = this.apiHistory.filter(endpoint => 
-      endpoint && 
-      typeof endpoint === 'object' &&
-      typeof endpoint.method === 'string' &&
-      typeof endpoint.name === 'string' &&
-      typeof endpoint.lastUsed === 'string' &&
-      !isNaN(Date.parse(endpoint.lastUsed))
+    this.apiHistory = this.apiHistory.filter(
+      (endpoint) =>
+        endpoint &&
+        typeof endpoint === "object" &&
+        typeof endpoint.method === "string" &&
+        typeof endpoint.name === "string" &&
+        typeof endpoint.lastUsed === "string" &&
+        !isNaN(Date.parse(endpoint.lastUsed))
     );
 
     const removedCount = initialLength - this.apiHistory.length;
@@ -332,21 +377,25 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       this.saveApiHistory();
       this.refresh();
     } else {
-      console.log('No invalid items found in API history.');
+      console.log("No invalid items found in API history.");
     }
   }
 
-  private loadEndpoint(endpoint: { method: string, name: string }) {
-    const savedEndpoint = this.apiHistory.find(e => e.method === endpoint.method && e.name === endpoint.name);
+  private loadEndpoint(endpoint: { method: string; name: string }) {
+    const savedEndpoint = this.apiHistory.find(
+      (e) => e.method === endpoint.method && e.name === endpoint.name
+    );
     if (savedEndpoint) {
+      console.log("Saved endpoint", savedEndpoint);
       this.apiRequestProvider.openApiRequestView();
       this.apiRequestProvider.loadEndpoint(savedEndpoint);
     }
   }
 }
 function getNonce() {
-  let text = '';
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let text = "";
+  const possible =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (let i = 0; i < 32; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }

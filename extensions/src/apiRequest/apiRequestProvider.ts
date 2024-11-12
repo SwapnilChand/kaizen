@@ -21,20 +21,20 @@ export class ApiRequestProvider {
   private view: ApiRequestView | undefined;
   private httpClient: HttpClient;
   private collections: Collection[] = [];
-  private environment: Record<string, string> = {};
+  // private environment: Record<string, string> = {};
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
     this.httpClient = new HttpClient();
     this.handleApiRequest = this.handleApiRequest.bind(this);
-    this.loadCollections();
-    this.loadEnvironment();
+    // this.loadCollections();
+    // this.loadEnvironment();
   }
 
   public openApiRequestView() {
     this.view = new ApiRequestView(this.context, this.handleApiRequest);
     this.view.show();
-    this.updateCollectionsView();
+    // this.updateCollectionsView();
   }
 
   private async handleApiRequest(
@@ -46,7 +46,6 @@ export class ApiRequestProvider {
     body: string,
     bodyType: string
   ): Promise<void> {
-
     let urlObj: URL;
 
     try {
@@ -111,59 +110,60 @@ export class ApiRequestProvider {
     }
   }
 
-  private replaceEnvironmentVariables(str: string): string {
-    return str.replace(
-      /\{\{(\w+)\}\}/g,
-      (_, key) => this.environment[key] || ""
-    );
-  }
+  // private replaceEnvironmentVariables(str: string): string {
+  //   return str.replace(
+  //     /\{\{(\w+)\}\}/g,
+  //     (_, key) => this.environment[key] || ""
+  //   );
+  // }
 
-  public addCollection(name: string) {
-    console.log("api Request view : AddCollections called");
-    this.collections.push({ name, requests: [] });
-    this.saveCollections();
-    this.updateCollectionsView();
-  }
+  // public addCollection(name: string) {
+  //   console.log("api Request view : AddCollections called");
+  //   this.collections.push({ name, requests: [] });
+  //   this.saveCollections();
+  //   this.updateCollectionsView();
+  // }
 
-  public addRequestToCollection(collectionName: string, request: ApiRequest) {
-    console.log("api Request view : AddRequestToCollections called");
-    const collection = this.collections.find((c) => c.name === collectionName);
-    if (collection) {
-      collection.requests.push(request);
-      this.saveCollections();
-      this.updateCollectionsView();
-    }
-  }
+  // public addRequestToCollection(collectionName: string, request: ApiRequest) {
+  //   console.log("api Request view : AddRequestToCollections called");
+  //   const collection = this.collections.find((c) => c.name === collectionName);
+  //   if (collection) {
+  //     collection.requests.push(request);
+  //     this.saveCollections();
+  //     this.updateCollectionsView();
+  //   }
+  // }
 
-  private loadCollections() {
-    this.collections = this.context.globalState.get("apiCollections", []);
-  }
+  // private loadCollections() {
+  //   this.collections = this.context.globalState.get("apiCollections", []);
+  // }
 
-  private saveCollections() {
-    this.context.globalState.update("apiCollections", this.collections);
-  }
+  // private saveCollections() {
+  //   this.context.globalState.update("apiCollections", this.collections);
+  // }
 
-  private updateCollectionsView() {
-    this.view?.postMessage({
-      command: "updateCollections",
-      collections: this.collections,
-    });
-  }
+  // private updateCollectionsView() {
+  //   this.view?.postMessage({
+  //     command: "updateCollections",
+  //     collections: this.collections,
+  //   });
+  // }
 
-  public setEnvironmentVariable(key: string, value: string) {
-    this.environment[key] = value;
-    this.saveEnvironment();
-  }
+  // public setEnvironmentVariable(key: string, value: string) {
+  //   this.environment[key] = value;
+  //   this.saveEnvironment();
+  // }
 
-  private loadEnvironment() {
-    this.environment = this.context.globalState.get("apiEnvironment", {});
-  }
+  // private loadEnvironment() {
+  //   this.environment = this.context.globalState.get("apiEnvironment", {});
+  // }
 
-  private saveEnvironment() {
-    this.context.globalState.update("apiEnvironment", this.environment);
-  }
+  // private saveEnvironment() {
+  //   this.context.globalState.update("apiEnvironment", this.environment);
+  // }
 
   public loadEndpoint(endpoint: ApiEndpoint) {
+    console.log("API endpoint loaded", endpoint);
     if (this.view) {
       this.view.loadEndpoint(endpoint);
     }

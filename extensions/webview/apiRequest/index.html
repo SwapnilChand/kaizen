@@ -735,38 +735,38 @@
 
                 // Create content with reset styles
                 const content = `
-                <!DOCTYPE html>
-                <html>
-                    <head>
-                        <style>
-                            body { 
-                                margin: 0;
-                                padding: 10px;
-                                font-family: monospace;
-                                background-color: inherit;
-                                color: inherit;
-                            }
-                            .json-formatter {
-                                font-family: monospace;
-                                font-size: 14px;
-                                line-height: 1.4;
-                            }
-                            .json-formatter .json-key { color: #7c7cbe; }
-                            .json-formatter .json-string { color: #6a8759; }
-                            .json-formatter .json-number { color: #6897bb; }
-                            .json-formatter .json-boolean { color: #cc7832; }
-                            .json-formatter .json-null { color: #cc7832; }
-                            pre {
-                                margin: 0;
-                                white-space: pre-wrap;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ${response}
-                    </body>
-                </html>
-            `;
+                            <!DOCTYPE html>
+                            <html>
+                                <head>
+                                    <style>
+                                        body {
+                                            margin: 0;
+                                            padding: 10px;
+                                            font-family: monospace;
+                                            background-color: inherit;
+                                            color: inherit;
+                                        }
+                                        .json-formatter {
+                                            font-family: monospace;
+                                            font-size: 14px;
+                                            line-height: 1.4;
+                                        }
+                                        .json-formatter .json-key { color: #7c7cbe; }
+                                        .json-formatter .json-string { color: #6a8759; }
+                                        .json-formatter .json-number { color: #6897bb; }
+                                        .json-formatter .json-boolean { color: #cc7832; }
+                                        .json-formatter .json-null { color: #cc7832; }
+                                        pre {
+                                            margin: 0;
+                                            white-space: pre-wrap;
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                    ${response}
+                                </body>
+                            </html>
+                        `;
 
                 iframe.srcdoc = content;
                 return iframe;
@@ -814,23 +814,143 @@
         }
       });
 
+      // document.getElementById("save").addEventListener("click", () => {
+      //   const method = document.getElementById("method").value;
+      //   const url = document.getElementById("url").value.trim();
+
+      //   vscode.postMessage({
+      //     command: "saveEndpoint",
+      //     method,
+      //     url,
+      //   });
+      // });
       document.getElementById("save").addEventListener("click", () => {
         const method = document.getElementById("method").value;
         const url = document.getElementById("url").value.trim();
+        const headers = collectTableData("headers-table");
+        const queryParams = collectTableData("query-params");
+        const bodyType = document.querySelector(
+          'input[name="body-type"]:checked'
+        ).value;
+        const formData =
+          bodyType === "form-data" ? collectTableData("form-data") : {};
+        const body =
+          bodyType === "raw"
+            ? document.getElementById("body-content").value
+            : "";
+
+        const authType = document.getElementById("auth-type").value;
+        let authData = {};
+        if (authType === "basic") {
+          authData = {
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value,
+          };
+        } else if (authType === "bearer") {
+          authData = {
+            token: document.getElementById("token").value,
+          };
+        }
 
         vscode.postMessage({
           command: "saveEndpoint",
           method,
           url,
+          headers,
+          queryParams,
+          formData,
+          body,
+          bodyType,
+          auth: {
+            type: authType,
+            data: authData,
+          },
+          // ,
+          // lastUsed: new Date().toISOString(), // Add the lastUsed property
         });
       });
 
+      // function loadEndpoint(endpoint) {
+      //   console.log("Loading endpoint: index.html");
+      //   document.getElementById("method").value = endpoint.method;
+      //   document.getElementById("url").value = endpoint.name;
+      //   document.getElementById("query-params").value = endpoint.queryParams;
+      // }
       function loadEndpoint(endpoint) {
         document.getElementById("method").value = endpoint.method;
         document.getElementById("url").value = endpoint.name;
-        // You might need to add more logic here to load other endpoint details
-        // such as headers, query params, body, etc., depending on what data
-        // you're storing in the ApiEndpoint object
+
+        // Load query parameters
+        const queryParamsTable = document.getElementById("query-params");
+        clearTableRows(queryParamsTable);
+        for (const [key, value] of Object.entries(endpoint.queryParams)) {
+          addRow(
+            queryParamsTable.querySelector(".action-button"),
+            "query-params"
+          );
+          const inputs = queryParamsTable.querySelectorAll(
+            "tr:last-child input"
+          );
+          inputs[0].value = key;
+          inputs[1].value = value;
+        }
+
+        // Load headers
+        const headersTable = document.getElementById("headers-table");
+        clearTableRows(headersTable);
+        for (const [key, value] of Object.entries(endpoint.headers)) {
+          addRow(headersTable.querySelector(".action-button"), "headers-table");
+          const inputs = headersTable.querySelectorAll("tr:last-child input");
+          inputs[0].value = key;
+          inputs[1].value = value;
+        }
+
+        // Load auth
+        const authTypeSelect = document.getElementById("auth-type");
+        authTypeSelect.value = endpoint.auth.type;
+        updateAuthFields(endpoint.auth.type, endpoint.auth.data);
+
+        // Load body
+        const bodyTypeRadios = document.querySelectorAll(
+          'input[name="body-type"]'
+        );
+        bodyTypeRadios.forEach((radio) => {
+          radio.checked = radio.value === endpoint.bodyType;
+        });
+
+        const bodyContentTextarea = document.getElementById("body-content");
+        bodyContentTextarea.value = endpoint.body;
+
+        const formDataTable = document.getElementById("form-data");
+        clearTableRows(formDataTable);
+        for (const [key, value] of Object.entries(endpoint.formData)) {
+          addRow(formDataTable.querySelector(".action-button"), "form-data");
+          const inputs = formDataTable.querySelectorAll("tr:last-child input");
+          inputs[0].value = key;
+          inputs[1].value = value;
+        }
+
+        handleBodyTypeChange();
+      }
+      //
+      function clearTableRows(table) {
+        table.querySelectorAll("tr:not(:first-child)").forEach((row) => {
+          row.remove();
+        });
+      }
+      //
+      function updateAuthFields(authType, authData) {
+        document.getElementById("basic-auth").style.display =
+          authType === "basic" ? "block" : "none";
+        document.getElementById("bearer-auth").style.display =
+          authType === "bearer" ? "block" : "none";
+
+        if (authType === "basic") {
+          document.getElementById("username").value = authData.username;
+          document.getElementById("password").value = authData.password;
+        } else if (authType === "bearer") {
+          document.getElementById("token").value = authData.token;
+        }
       }
     </script>
   </body>
