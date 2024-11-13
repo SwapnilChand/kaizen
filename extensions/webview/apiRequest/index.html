@@ -515,38 +515,39 @@
       });
 
       // Modify addRow function
-      function addRow(button, tableId) {
-        console.log("Inside add row");
-        const table = document.getElementById(tableId);
-        const row = button.closest("tr");
-        const newRow = row.cloneNode(true);
-        newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
-        const actionButton = newRow.querySelector(".action-button");
-        actionButton.textContent = "-";
-        actionButton.onclick = function () {
-          removeRow(this);
-        };
-        table.appendChild(newRow);
-      }
-
-      // function addRow(tableId) {
+      // function addRow(button, tableId) {
+      //   console.log("Inside add row");
       //   const table = document.getElementById(tableId);
-      //   if (!table) {
-      //     console.error(`Table with id "${tableId}" not found`);
-      //     return;
-      //   }
-      //   const lastRow = table.rows[table.rows.length - 1];
-      //   const newRow = lastRow.cloneNode(true);
+      //   const row = button.closest("tr");
+      //   const newRow = row.cloneNode(true);
       //   newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
       //   const actionButton = newRow.querySelector(".action-button");
-      //   if (actionButton) {
-      //     actionButton.textContent = "-";
-      //     actionButton.onclick = function () {
-      //       removeRow(this);
-      //     };
-      //   }
+      //   actionButton.textContent = "-";
+      //   actionButton.onclick = function () {
+      //     removeRow(this);
+      //   };
       //   table.appendChild(newRow);
       // }
+
+      //this code allows addRow to work but the saved rows are all messed up, multple rows are not being saved as of now
+      function addRow(tableId) {
+        const table = document.getElementById(tableId);
+        if (!table) {
+          console.error(`Table with id "${tableId}" not found`);
+          return;
+        }
+        const lastRow = table.rows[table.rows.length - 1];
+        const newRow = lastRow.cloneNode(true);
+        newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
+        const actionButton = newRow.querySelector(".action-button");
+        if (actionButton) {
+          actionButton.textContent = "-";
+          actionButton.onclick = function () {
+            removeRow(this);
+          };
+        }
+        table.appendChild(newRow);
+      }
 
       // Modify removeRow function
       function removeRow(button) {
